@@ -28,4 +28,3 @@ from Northwind.dbo.Employees
 where Employees.ReportsTo IS NULL
 or Employees.Title like '%Manager%';
 
-5.

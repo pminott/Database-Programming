@@ -1,0 +1,71 @@
+Northwind database queries
+
+1.	Create a sproc for adding a new record in the Customers table
+use Northwind;
+go
+create proc spcustomer
+@customerID varchar(50), @companyname varchar(50) = null,
+@ContactName varchar(50) = null, @contactTitle varchar(50) = null, 
+@Address varchar(50) = null, 
+@City varchar(50) = null, @Region varchar(50) = null, 
+@PostalCode varchar(50) = null, @Country varchar(50) = null, 
+@Phone varchar(50) = null, @Fax varchar(50) = null 
+as
+begin 
+insert into dbo.Customers
+([CustomerID], [CompanyName], [ContactName], 
+[ContactTitle],[Address], [City], [Region], 
+[PostalCode], [Country], [Phone], [Fax])
+values 
+(@customerID, @companyname,
+@ContactName, @contactTitle, @Address, 
+@City, @Region, 
+@PostalCode, @Country, @Phone, @Fax)  
+end;
+
+2.	Create a sproc for the following action: Insert a new customer record in the customers table; generate a message if the customer is already in the database.
+
+use Northwind;
+go
+create proc spcustomerCheckInsert
+@customerID varchar(50), @companyname varchar(50) = null,
+@ContactName varchar(50) = null, @contactTitle varchar(50) = null, 
+@Address varchar(50) = null, 
+@City varchar(50) = null, @Region varchar(50) = null, 
+@PostalCode varchar(50) = null, @Country varchar(50) = null, 
+@Phone varchar(50) = null, @Fax varchar(50) = null 
+as
+	if exists (select Customers.CustomerID, Customers.CompanyName 
+		from Northwind.dbo.Customers 
+		where Customers.CustomerID like @customerID +'%' and
+		Customers.CompanyName like @companyname +'%' and
+		Customers.ContactName like @ContactName + '%' and
+		Customers.ContactTitle like @contactTitle +'%' and
+		Customers.[Address] like @Address + '%' and 
+		Customers.City like @city +'%' and
+		Customers.Region like @City +'%' and
+		Customers.PostalCode like @PostalCode +'%' and
+		Customers.Country like @Country +'%' and
+		Customers.Phone like @Phone +'%' and
+		Customers.Fax like @Fax +'%'
+		)
+		begin
+			print 'The Customer is already in the system.';
+		end 
+
+	else
+		begin 
+			insert into dbo.Customers
+			([CustomerID], [CompanyName], [ContactName], 
+			[ContactTitle],[Address], [City], [Region], 
+			[PostalCode], [Country], [Phone], [Fax])
+			values 
+			(@customerID, @companyname,
+			@ContactName, @contactTitle, @Address, 
+			@City, @Region, 
+			@PostalCode, @Country, @Phone, @Fax)
+			
+			print 'The Customer has been inserted into the system';  
+		end;
+
+3. 

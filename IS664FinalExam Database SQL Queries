@@ -1,0 +1,70 @@
+a.	What products have a price that exceeds the average product price? 
+select P_DESCRIPT, P_PRICE
+from IS664FinalExam.dbo.PRODUCT
+where P_PRICE > (select avg(P_PRICE)
+from IS664FinalExam.dbo.PRODUCT );
+
+b.	List all invoice data (CUS_LNAME, CUS_FNAME, INVOICE.INV_NUMBER, INV_DATE, P_DESCRIPT) for customer number 10011. 
+select distinct CUS_LNAME, CUS_FNAME, INVOICE.INV_NUMBER, INV_DATE, P_DESCRIPT
+from IS664FinalExam.dbo.PRODUCT join IS664FinalExam.dbo.LINE
+on PRODUCT.P_CODE = LINE.P_CODE
+join IS664FinalExam.dbo.INVOICE on
+INVOICE.INV_NUMBER = LINE.INV_NUMBER
+join IS664FinalExam.dbo.CUSTOMER
+ON CUSTOMER.CUS_CODE = INVOICE.CUS_CODE
+where CUSTOMER.CUS_CODE LIKE '10011';
+
+c.	Display vendors whose products have not been ordered by Company A: Do not use the column V_Order. 
+select VENDOR.V_NAME
+from IS664FinalExam.dbo.VENDOR join IS664FinalExam.dbo.PRODUCT  
+on PRODUCT.V_CODE = VENDOR.V_CODE
+WHERE PRODUCT.P_CODE NOT IN
+		(SELECT LINE.P_CODE FROM IS664FinalExam.dbo.LINE);
+		
+d.	Find the product with lowest unit price. 
+select  P_DESCRIPT, P_PRICE 
+from IS664FinalExam.dbo.PRODUCT 
+where P_PRICE =(select min(P_PRICE) 
+		from IS664FinalExam.dbo.PRODUCT);
+
+4.	Create a view called "CheapProduct" in your "IS664FinalExam" database to list all products (show these column information: P_DESCRIPT, P_QOH, P_PRICE) with price less than 50. 
+create view CheapProduct
+as 
+select P_DESCRIPT, P_QOH, P_PRICE
+		from IS664FinalExam.dbo.PRODUCT
+		where P_PRICE < 50.00;
+
+5.	List all the customers who have not made any purchase: display the customer name as <CUS_LName, CUS_FName> with the heading (Customer_Name): 
+select distinct CUS_LNAME, CUS_FNAME, CUSTOMER.CUS_CODE
+From IS664FinalExam.dbo.CUSTOMER 
+where not exists (select INVOICE.CUS_CODE
+	from IS664FinalExam.dbo.INVOICE
+	where CUSTOMER.CUS_CODE = INVOICE.CUS_CODE);
+
+6.	Write a stored procedure that accepts an INV_NUMBER, CUS_CODE, and INV_DATE, and inserts them as a new row in the INVOICE table in your "IS664FinalExam" database. Then run the procedure to add one new row. 
+use IS664FinalExam;
+
+go
+create proc spInsertInvoice
+@INV_NUMBER varchar(50) = null, @CUS_CODE varchar(50) = null, 
+@INV_DATE varchar(50) = null
+as 
+begin
+	insert into dbo.INVOICE
+	(INV_NUMBER, CUS_CODE, INV_DATE)
+	values
+	(@INV_NUMBER, @CUS_CODE, @INV_DATE)
+end;
+
+7.	Create a non-clustered index on the P_PRICE column of the PRODUCT table in your "IS664FinalExam" database and then delete the index you created. 
+use IS664FinalExam;
+create nonclustered index modifiedP_PriceIndex
+on PRODUCT(P_PRICE);
+
+To delete the index: 
+use IS664FinalExam;
+drop index modifiedP_PriceIndex
+on PRODUCT;
+
+8.	Write a simple T-SQL script to output the name of the local server that the script is running from. 
+select @@SERVERNAME;

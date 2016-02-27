@@ -1,0 +1,57 @@
+CapeCodd Database Queries
+
+1. Determine buyers in the Water Sport Department
+Select distinct Buyer 
+from CapeCodd.dbo.SKU_DATA
+where Department like '%Water Sports%';
+
+2. Find all the columns where price is listed in descending order and then OrderNumber is in ascending order 
+Select *
+From CapeCodd.dbo.ORDER_ITEM
+order by Price desc, OrderNumber;
+
+3. Find SKUs that are purchased by buyers other than Nancy Meyers, Cindy Lo and Jerry Martin
+Select SKU
+from CapeCodd.dbo.SKU_DATA
+where (Buyer not like 'Nancy Meyers') 
+and (Buyer not like 'Cindy Lo') 
+and (Buyer not like 'Jerry Martin');
+
+4. Find SKU that have 2 in the third column from the right
+Select distinct SKU
+from CapeCodd.dbo.INVENTORY
+where SKU like '%2__';
+
+5. Find the maximum, minimum, and average extended price.
+Select max(ExtendedPrice) as maxExtendedPrice, 
+min(ExtendedPrice) as minExtendedPrice, 
+avg(ExtendedPrice) as avgExtendedPrice 
+from CapeCodd.dbo.ORDER_ITEM;
+
+6. Find the number of departments
+Select count(distinct Department) 
+as totalDepartments
+from CapeCodd.dbo.SKU_DATA;
+
+7. Determine how many SKUs are being ordered by each department
+Select count(SKU) as totalSKUs, Department
+from Capecodd.dbo.SKU_DATA
+group by Department;
+
+8. Determine if the ExtendedPrice column is correct
+select (quantity*price) as priceCheck,ExtendedPrice 
+From CapeCodd.dbo.ORDER_ITEM;
+
+9. What is the extended price for order 3000
+Select sum(ExtendedPrice) as totalExtendedPrice
+from CapeCodd.dbo.ORDER_ITEM
+where OrderNumber like '%3000';
+
+10. What orders have an extended price between $100 and $200
+Select OrderNumber, sum(ExtendedPrice) as SumExtendedPrice
+from CapeCodd.dbo.ORDER_ITEM
+group by OrderNumber
+having (sum(ExtendedPrice) >= 100) 
+and (sum(ExtendedPrice) < 200);
+
+

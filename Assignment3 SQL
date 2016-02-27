@@ -1,0 +1,31 @@
+AdventureWorks2012 database queries
+
+1. Create a non-clustered index on the ModifiedDate column of the Production,ProductionModel table
+Use AdventureWorks2012;
+create nonclustered index modifiedDateIndex
+on Production.ProductModel (ModifiedDate);
+
+
+2. Delete the index
+Use AdventureWorks2012;
+drop index modifiedDateIndex
+on Production.ProductModel;
+
+3. Add a view called Managers in the Northwind database that shows only employees that supervise other employees
+create view Managers_vw
+AS
+select Employees.EmployeeID, Employees.FirstName, Employees.LastName
+from Northwind.dbo.Employees
+where Employees.ReportsTo IS NULL
+or Employees.Title like '%Manager%';
+
+4. Change this view to be encrypted
+alter view Managers_vw
+with encryption
+as
+select Employees.EmployeeID, Employees.FirstName, Employees.LastName
+from Northwind.dbo.Employees
+where Employees.ReportsTo IS NULL
+or Employees.Title like '%Manager%';
+
+5.

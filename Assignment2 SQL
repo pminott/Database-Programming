@@ -1,0 +1,104 @@
+CapeCodd database queries
+
+1.	Find the total extended price for items managed by the Water Sports department.
+select sum(ExtendedPrice) as sumExtendedPrice
+from CapeCodd.dbo.SKU_DATA join CapeCodd.dbo.ORDER_ITEM
+on ORDER_ITEM.SKU = SKU_DATA.SKU
+where SKU_DATA.Department like '%Water Sports%';
+
+2. What buyers managed the products purchased in January 2009?
+select distinct Buyer
+from CapeCodd.dbo.SKU_DATA join CapeCodd.dbo.ORDER_ITEM
+on ORDER_ITEM.SKU = SKU_DATA.SKU join CapeCodd.dbo.RETAIL_ORDER 
+on RETAIL_ORDER.OrderNumber =ORDER_ITEM.OrderNumber
+where RETAIL_ORDER.OrderYear like '%2009%' 
+and RETAIL_ORDER.OrderMonth like '%January%';
+
+3. Show the SKUs, description and department of order 3000.
+
+SKU 	SKU_Description, 			Department 
+101200	Dive Mask, Med Clear               	Water Sports                  
+101100	Dive Mask, Small Clear             	Water Sports                  
+100200	Std. Scuba Tank, Magenta           	Water Sports                  
+
+Code:
+select SKU_DATA.SKU, SKU_Description, Department
+from CapeCodd.dbo.SKU_DATA join CapeCodd.dbo.ORDER_ITEM
+on ORDER_ITEM.SKU = SKU_DATA.SKU 
+where OrderNumber like '3000' 
+order by SKU_DATA.SKU desc;
+
+4. How many order did the Water Sports Department have?
+select count(distinct OrderNumber) as waterSportsOrders
+from CapeCodd.dbo.SKU_DATA join CapeCodd.dbo.ORDER_ITEM
+on ORDER_ITEM.SKU = SKU_DATA.SKU 
+where Department like 'Water Sports';
+
+5. Show the description and order number for each SKU
+
+SKU 	SKU_Description	 		OrderNumber
+100100	Std. Scuba Tank, Yellow            	NULL
+100200	Std. Scuba Tank, Magenta           	3000
+101100	Dive Mask, Small Clear             	2000
+101100	Dive Mask, Small Clear             	3000
+101200	Dive Mask, Med Clear               	2000
+101200	Dive Mask, Med Clear               	3000
+201000	Half-dome Tent                     	1000
+202000	Half-dome Tent Footprint           	1000
+301000	Light Fly Climbing Harness         	NULL
+302000	Locking carabiner, Oval            	NULL
+
+Code:
+select SKU_DATA.SKU, SKU_Description, OrderNumber
+from CapeCodd.dbo.SKU_DATA left outer join CapeCodd.dbo.ORDER_ITEM
+on ORDER_ITEM.SKU = SKU_DATA.SKU;
+
+6.	List the SKUs that are not included in any orders.
+SKU
+100100
+301000
+302000
+
+Code:
+select distinct INVENTORY.SKU
+from CapeCodd.dbo.INVENTORY 
+where INVENTORY.SKU not in 
+(select ORDER_ITEM.SKU 
+from CapeCodd.dbo.ORDER_ITEM);
+
+7. Show	SKU, decription, order number and store number.
+SKU 	  SKU_Description 			        OrderNumber		StoreNumber, 
+100100	Std. Scuba Tank, Yellow       NULL		    	NULL
+100200	Std. Scuba Tank, Magenta     	3000			    10
+101100	Dive Mask, Small Clear       	2000	    		20
+101100	Dive Mask, Small Clear       	3000		    	10
+101200	Dive Mask, Med Clear         	2000			    20
+101200	Dive Mask, Med Clear         	3000	    		10
+201000	Half-dome Tent             		1000	    		10
+202000	Half-dome Tent Footprint     	1000    			10
+301000	Light Fly Climbing Harness   	NULL			    NULL
+302000	Locking carabiner            	NULL	    		NULL
+
+Code:
+Select distinct INVENTORY.SKU, INVENTORY.SKU_Description, ORDER_ITEM.OrderNumber, RETAIL_ORDER.StoreNumber
+from CapeCodd.dbo.INVENTORY left outer join CapeCodd.dbo.SKU_DATA 
+on INVENTORY.SKU = SKU_DATA.SKU left outer join CapeCodd.dbo.ORDER_ITEM 
+on ORDER_ITEM.SKU = SKU_DATA.SKU left outer join CapeCodd.dbo.RETAIL_ORDER
+on RETAIL_ORDER.OrderNumber = ORDER_ITEM.OrderNumber
+
+EMPDEPT database queries
+
+8. Determine the manager of the marketing department
+select Employee.Ename
+from EMPDEPT.dbo.Department join EMPDEPT.dbo.Employee
+on Department.DeptNo = Employee.DeptNo
+where Department.DName like '%Accounting%'
+and exists (select Employee.MGR where MGR is null);
+
+9. Determine the most recent hire
+select Ename, Employee.HireDate
+from (select max(Employee.HireDate) as HireDate from EMPDEPT.dbo.Employee) t, EMPDEPT.dbo.Employee
+where Employee.HireDate = t.HireDate;
+
+
+
